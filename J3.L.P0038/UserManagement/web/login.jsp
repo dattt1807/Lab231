@@ -12,15 +12,17 @@
         <title>Login Page</title>
     </head>
     <body>
-        <h1>Login Page</h1>
-        <span style="color: red">${requestScope.ERROR}</span>
-        <form action="MainController" method="POST">
-            Username: <input type="text" name="txtUsername" value="sa" 
-                             pattern="[A-Za-z0-9]{2,30}"title="30 letter"/> </br>
-            Password: <input type="password" name="txtPassword" value="123"
-                             pattern="[A-Za-z0-9]{3,30}"title="30 letter"/></br>
-            <input type="submit" value="Login" name="action" />   
-        </form>
+        <div style="width: 200px; height: 200px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+            <h1>Login Page</h1>
+            <span style="color: red">${requestScope.ERROR}</span>
+            <form action="MainController" method="POST">
+                Username: <input type="text" name="txtUsername" value="sa" 
+                                 pattern="[A-Za-z0-9]{0,30}"title="30 letter"/> </br>
+                Password: <input type="password" name="txtPassword" value="123"
+                                 pattern="[A-Za-z0-9]{0,30}"title="30 letter"/></br>
+                <input type="submit" value="Login" name="action" />   
+            </form>
+        </div>
     </body>
 
     <script type="text/javascript">

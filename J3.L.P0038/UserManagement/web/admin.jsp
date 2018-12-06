@@ -84,8 +84,7 @@
                             <td>${user.email}</td>
                             <td>${user.role}</td>
                         </tr>
-                    </emvh:forEach>
-
+                    </emvh:forEach> 
                 </tbody>
                 <tfoot>
                     <tr>

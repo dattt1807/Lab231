@@ -36,14 +36,19 @@ public class LoginController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
+            RegistrationDAO dao = new RegistrationDAO();
             String username = request.getParameter("txtUsername");
             String password = request.getParameter("txtPassword");
-            RegistrationDAO dao = new RegistrationDAO();
             String role = dao.checkLogin(username, password);
             HttpSession session = request.getSession();
             session.setAttribute("USERNAME", username + "[" + role + "]");
+            //Get role from db
+            //If message return Ad then foward admin page
+            // message return not AD then foward sub page
+            // message return falied that mean username and password doesn't match
             if (role.equals("Adminitrator")) {
                 url = ADMIN;
+                //Set some information to display
                 List<User> listUser = dao.getAllUser();
                 request.setAttribute("listUser", listUser);
                 List<Role> listRole = dao.getAllRole();

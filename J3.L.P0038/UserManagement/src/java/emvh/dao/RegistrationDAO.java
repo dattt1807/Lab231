@@ -9,6 +9,9 @@ import emvh.connection.MyConnection;
 import emvh.dto.Role;
 import emvh.dto.User;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,7 +55,7 @@ public class RegistrationDAO implements Serializable {
             conn = MyConnection.getMyConnection();
             preStm = conn.prepareStatement(sql);
             preStm.setString(1, username);
-            preStm.setString(2, password);
+            preStm.setString(2, getEncrypPassword(password));
             rs = preStm.executeQuery();
             if (rs.next()) {
                 role = rs.getString("roleName");
@@ -240,7 +243,7 @@ public class RegistrationDAO implements Serializable {
             preStm.setString(1, user.getUserID());
             preStm.setString(2, user.getFirstName());
             preStm.setString(3, user.getLastName());
-            preStm.setString(4, user.getPassword());
+            preStm.setString(4, getEncrypPassword(user.getPassword()));
             preStm.setString(5, user.getEmail());
             preStm.setString(6, user.getRole());
             preStm.setString(7, user.getNotification());
@@ -256,5 +259,10 @@ public class RegistrationDAO implements Serializable {
             closConnection();
         }
         return message;
+    }
+    
+    public String getEncrypPassword(String password) throws NoSuchAlgorithmException{
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        return new BigInteger(1, md.digest(password.getBytes())).toString(16);
     }
 }

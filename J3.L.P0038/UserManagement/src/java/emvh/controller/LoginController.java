@@ -10,6 +10,7 @@ import emvh.dto.Role;
 import emvh.dto.User;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,8 @@ public class LoginController extends HttpServlet {
     private final String ERROR = "error.jsp";
     private final String ADMIN = "admin.jsp";
     private final String SUBSCRIBER = "subscriber.jsp";
-    
+    private final String FAILED = "login.jsp";
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -40,7 +42,7 @@ public class LoginController extends HttpServlet {
             String role = dao.checkLogin(username, password);
             HttpSession session = request.getSession();
             session.setAttribute("USERNAME", username + "[" + role + "]");
-            if(role.equals("Adminitrator")){
+            if (role.equals("Adminitrator")) {
                 url = ADMIN;
                 List<User> listUser = dao.getAllUser();
                 request.setAttribute("listUser", listUser);
@@ -50,12 +52,13 @@ public class LoginController extends HttpServlet {
                 Map<String, Integer> map = dao.countRole();
                 request.setAttribute("map", map);
                 request.setAttribute("TOTAL", dao.countAllUser());
-            } else if (role.equals("Subscriber")){
+            } else if (!role.equals("Adminitrator") && !role.equals("failed")) {
                 url = SUBSCRIBER;
             } else {
-                request.setAttribute("ERROR", "Your role is not support");
+                request.setAttribute("ERROR", "Invalid username or password!");
+                url = FAILED;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             log("ERROR at LoginController: " + e.getMessage());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);

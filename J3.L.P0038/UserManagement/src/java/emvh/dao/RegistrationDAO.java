@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +137,7 @@ public class RegistrationDAO implements Serializable {
         }
         return list;
     }
-    
+
     public List<User> searchLikeNameWithRole(String searchName, String searchRole) throws SQLException {
         List<User> list = new ArrayList<>();
         try {
@@ -165,7 +166,7 @@ public class RegistrationDAO implements Serializable {
         }
         return list;
     }
-    
+
     public Integer countAllUser() throws SQLException {
         int count = -1;
         try {
@@ -173,7 +174,7 @@ public class RegistrationDAO implements Serializable {
             conn = MyConnection.getMyConnection();
             preStm = conn.prepareStatement(sql);
             rs = preStm.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 count = rs.getInt("total");
             }
         } catch (Exception e) {
@@ -183,7 +184,7 @@ public class RegistrationDAO implements Serializable {
         }
         return count;
     }
-    
+
     public Map<String, Integer> countRole() throws SQLException {
         Map<String, Integer> map = new HashMap<>();
         try {
@@ -191,7 +192,7 @@ public class RegistrationDAO implements Serializable {
             conn = MyConnection.getMyConnection();
             preStm = conn.prepareStatement(sql);
             rs = preStm.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 map.put(rs.getString("roleID"), rs.getInt("total"));
             }
         } catch (Exception e) {
@@ -199,7 +200,61 @@ public class RegistrationDAO implements Serializable {
         } finally {
             closConnection();
         }
-        
+
         return map;
+    }
+
+    public boolean updateRole(String[] userID) throws SQLException {
+        boolean check = false;
+        List<String> possibleValues = Arrays.asList(userID);
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < possibleValues.size(); i++) {
+            builder.append("?,");
+        }
+        try {
+            String sql = "update tblUsers set roleID = 'AD' where userID in ("
+                    + builder.deleteCharAt(builder.length() - 1).toString() + ")";
+            conn = MyConnection.getMyConnection();
+            preStm = conn.prepareStatement(sql);
+            int index = 1;
+            for (Object o : possibleValues) {
+                preStm.setObject(index++, o); // or whatever it applies 
+            }
+            check = preStm.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closConnection();
+        }
+        return check;
+    }
+
+    public String addUser(User user) throws SQLException {
+        String message = "failed";
+        boolean check = false;
+        try {
+            String sql = "insert into tblUsers(userID, firstName, lastName, password, email, roleID, isSendNotification) "
+                    + "values(?,?,?,?,?,?,?)";
+            conn = MyConnection.getMyConnection();
+            preStm = conn.prepareStatement(sql);
+            preStm.setString(1, user.getUserID());
+            preStm.setString(2, user.getFirstName());
+            preStm.setString(3, user.getLastName());
+            preStm.setString(4, user.getPassword());
+            preStm.setString(5, user.getEmail());
+            preStm.setString(6, user.getRole());
+            preStm.setString(7, user.getNotification());
+            check = preStm.executeUpdate() > 0;
+            if(check) message = "success";
+        } catch (Exception e) {
+            if(e.getMessage().contains("Cannot insert duplicate key")){
+                message = "Duplicate key";
+            } else {
+                e.printStackTrace();
+            }
+        } finally {
+            closConnection();
+        }
+        return message;
     }
 }

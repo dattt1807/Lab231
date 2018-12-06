@@ -19,6 +19,7 @@ public class User implements Serializable{
     private String password;
     private String email;
     private String role;
+    private String notification;
 
     public User() {
     }
@@ -31,6 +32,25 @@ public class User implements Serializable{
         this.role = role;
     }
 
+    public User(String userID, String firstName, String lastName, String password, String email, String role, String notification) {
+        this.userID = userID;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.notification = notification;
+    }
+
+    public String getNotification() {
+        return notification;
+    }
+
+    public void setNotification(String notification) {
+        this.notification = notification;
+    }
+
+    
     
     
     public User(String userID, String firstName, String lastName, String password, String email, String role) {

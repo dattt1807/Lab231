@@ -5,8 +5,13 @@
  */
 package emvh.controller;
 
+import emvh.dao.RegistrationDAO;
+import emvh.dto.Role;
+import emvh.dto.User;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,36 +21,32 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Admin
  */
-public class MainController extends HttpServlet {
+public class UpdateController extends HttpServlet {
 
     private final String ERROR = "error.jsp";
-    private final String LOGIN = "LoginController";
-    private final String LOGOUT = "LogoutController";
-    private final String SEARCH = "SearchController";
-    private final String UPDATE = "UpdateController";
-    private final String INSERT = "InsertController";
+    private final String SUCCESS = "admin.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
-            String action = request.getParameter("action");
-            if (action.equals("Login")) {
-                url = LOGIN;
-            } else if (action.equals("Logout")) {
-                url = LOGOUT;
-            } else if (action.equals("Search")) {
-                url = SEARCH;
-            } else if (action.equals("Change to Admin")) {
-                url = UPDATE;
-            } else if (action.equals("Add new User")) {
-                url = INSERT;
-            } else {
-                request.setAttribute("ERROR", "Action is not support");
-            }
+            String[] userID = request.getParameterValues("checkboxlist");  
+            RegistrationDAO dao = new RegistrationDAO();
+            boolean check = dao.updateRole(userID);
+            if(check){
+              url = SUCCESS;
+              List<User> listUser = dao.getAllUser();
+                request.setAttribute("listUser", listUser);
+                List<Role> listRole = dao.getAllRole();
+                request.setAttribute("listRole", listRole);
+                request.setAttribute("ROLE", "ALL");
+                Map<String, Integer> map = dao.countRole();
+                request.setAttribute("map", map);
+                request.setAttribute("TOTAL", dao.countAllUser());
+            }   
         } catch (Exception e) {
-            log("ERROR at MainController: " + e.getMessage());
+            log("ERROR at UpdateController: " + e.getMessage());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
